@@ -1,79 +1,45 @@
 class Licensee
   class LicenseFile
+    attr_reader :blob
 
-    FILENAMES = %w[
-      LICENSE
-      LICENSE.txt
-      LICENSE.md
-      UNLICENSE
-      COPYING
-    ]
-
-    attr_reader :path
-    attr_accessor :contents
-
-    def initialize(path=nil)
-      @path = File.expand_path(path) unless path.nil?
+    def initialize(blob)
+      @blob = blob
+      blob.hashsig(Rugged::Blob::HashSignature::WHITESPACE_SMART)
     end
 
-    def contents
-      @contents ||= File.open(path).read
-    end
-    alias_method :to_s, :contents
-    alias_method :content, :contents
-
-    def self.find(base_path)
-      raise "Invalid directory" unless directory_exists? base_path
-      file = self::FILENAMES.find { |file| file_exists?(file, base_path) }
-      new(File.expand_path(file, base_path)) if file
-    end
-
-    def self.directory_exists?(base_path)
-      File.directory?(base_path)
-    end
-
-    def self.file_exists?(file, base_path)
-      File.exists? File.expand_path(file, base_path)
-    end
-
-    def length
-      @length ||= content.length
-    end
-
-    def length_delta(license)
-      (length - license.length).abs
-    end
-
-    def potential_licenses
-      @potential_licenses ||= Licensee::Licenses.list.clone.select { |l| length_delta(l) < length }
-    end
-
-    def licenses_sorted
-      @licenses_sorted ||= potential_licenses.sort_by { |l| length_delta(l) }
-    end
-
-    def matches
-      @matches ||= begin
-        licenses_sorted.each { |l| l.match = 1 - percent_changed(l) }
-        licenses_sorted.sort_by { |l| l.match }.select { |l| l.match > 0}.reverse
+    # Raw file contents
+    def content
+      @contents ||= begin
+        blob.content
       end
     end
+    alias_method :to_s, :content
+    alias_method :contents, :content
 
+    # File content with all whitespace replaced with a single space
+    def content_normalized
+      @content_normalized ||= content.downcase.gsub(/\s+/, " ").strip
+    end
+
+    # Comptutes a diff between known license and project license
+    def diff(options={})
+      options = options.merge(:reverse => true)
+      blob.diff(match.body, options).to_s if match
+    end
+
+    # Determines which matching strategy to use, returns an instane of that matcher
+    def matcher
+      @matcher ||= Licensee.matchers.map { |m| m.new(self) }.find { |m| m.match }
+    end
+
+    # Returns an Licensee::License instance of the matches license
     def match
-      @match ||= licenses_sorted.find do |license|
-        confidence = 1 - percent_changed(license)
-        next unless confidence >= Licensee::CONFIDENCE_THRESHOLD
-        license.match = confidence
-      end
+      @match ||= matcher.match if matcher
     end
 
-    def percent_changed(license)
-      (Levenshtein.distance(content, license.body).to_f / content.length.to_f).abs
+    # Returns the percent confident with the match
+    def confidence
+      @condience ||= matcher.confidence if matcher
     end
-
-    def diff(options=nil)
-      Diffy::Diff.new(match.body, content).to_s(options)
-    end
-
   end
 end
