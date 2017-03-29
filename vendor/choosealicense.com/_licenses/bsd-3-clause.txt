@@ -1,30 +1,29 @@
 ---
-layout: license
-title: New BSD
-category: BSD
-tab-slug: bsd-3
-hide-from-license-list: true
-permalink: /licenses/bsd-3-clause/
-
-how: Create a text file (typically named LICENSE or LICENSE.txt) in the root of your source code and copy the text of the license into the file. Replace [year] with the current year and [fullname] with the name (or names) of the copyright holders. Replace {organization} with the organization, if any, that sponsors this work.
-
+title: BSD 3-clause "New" or "Revised" License
+spdx-id: BSD-3-Clause
 source: http://opensource.org/licenses/BSD-3-Clause
+hidden: false
 
-required:
-  - include-copyright
+description: A permissive license similar to the <a href="/licenses/bsd-2-clause/">BSD 2-Clause License</a>, but with a 3rd clause that prohibits others from using the name of the project or its contributors to promote derived products without written consent.
 
-permitted:
+how: Create a text file (typically named LICENSE or LICENSE.txt) in the root of your source code and copy the text of the license into the file. Replace [year] with the current year and [fullname] with the name (or names) of the copyright holders. Replace [project] with the project organization, if any, that sponsors this work.
+
+permissions:
   - commercial-use
   - modifications
   - distribution
-  - sublicense
   - private-use
 
-forbidden:
-  - no-liability
-  - trademark-use
+conditions:
+  - include-copyright
+
+limitations:
+  - liability
+  - warranty
 
 ---
+
+BSD 3-Clause License
 
 Copyright (c) [year], [fullname]
 All rights reserved.
@@ -39,7 +38,7 @@ modification, are permitted provided that the following conditions are met:
   this list of conditions and the following disclaimer in the documentation
   and/or other materials provided with the distribution.
 
-* Neither the name of [project] nor the names of its
+* Neither the name of the copyright holder nor the names of its
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
 

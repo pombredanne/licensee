@@ -1,3 +1,3 @@
-class Licensee
-  VERSION = "4.2.2"
+module Licensee
+  VERSION = '8.8.5'.freeze
 end

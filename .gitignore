@@ -1,17 +1,20 @@
 Gemfile.lock
 /*.gem
 /tmp
+/spec/examples.txt
+/coverage
 
 vendor/html5shiv
 vendor/jquery
 vendor/normalize-css
 vendor/qtip2
 vendor/selectivizr
-vendor/zeroclipboard
+vendor/clipboard/
 vendor/eventEmitter
 vendor/eventie
 vendor/imagesloaded
-vendor/choosealicense.com/_data
+vendor/ev-emitter
+vendor/choosealicense.com/_sass
 vendor/choosealicense.com/_includes
 vendor/choosealicense.com/_layouts
 vendor/choosealicense.com/assets
@@ -20,3 +23,4 @@ vendor/choosealicense.com/*.*
 vendor/choosealicense.com/CNAME
 vendor/choosealicense.com/Gemfile
 vendor/choosealicense.com/Rakefile
+vendor/choosealicense.com/spec

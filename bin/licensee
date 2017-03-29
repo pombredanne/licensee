@@ -1,12 +1,50 @@
 #!/usr/bin/env ruby
 
-require_relative "../lib/licensee"
-license = Licensee::Project.new(Dir.pwd).license_file
+require_relative '../lib/licensee'
 
-if license
-  puts "License: #{license.match ? license.match.meta['title'] : 'no license'}"
-  puts "Confidence: #{license.confidence}%"
-  puts "Method: #{license.matcher.class}"
-else
-  puts "Unknown"
+path = ARGV[0] || Dir.pwd
+
+def format_percent(float)
+  "#{format('%.2f', float)}%"
 end
+
+project = Licensee.project(path, detect_packages: true, detect_readme: true)
+license_file = project.license_file
+matched_file = project.matched_file
+
+if license_file
+  puts "License file: #{license_file.filename}"
+  puts "License hash: #{license_file.hash}"
+  puts "Attribution: #{license_file.attribution}" if license_file.attribution
+end
+
+unless matched_file
+  puts 'License: Not detected'
+  exit 1
+end
+
+if matched_file.license
+  puts "License: #{matched_file.license.meta['title']}"
+
+  if matched_file.confidence
+    puts "Confidence: #{format_percent(matched_file.confidence)}"
+  end
+
+  puts "Method: #{matched_file.matcher.class}" if matched_file.matcher
+  exit 0
+end
+
+if matched_file.is_a?(Licensee::Project::LicenseFile)
+  matcher = Licensee::Matchers::Dice.new(matched_file)
+  licenses = matcher.licenses_by_similiarity
+  unless licenses.empty?
+    puts
+    puts "Here's the closest licenses:"
+    licenses[0...3].each do |license, similarity|
+      spdx_id = license.meta['spdx-id']
+      puts "* #{spdx_id} similarity: #{format_percent(similarity)}"
+    end
+  end
+end
+
+exit 1
